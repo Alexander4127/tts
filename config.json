@@ -1,5 +1,5 @@
 {
-  "name": "1_initial",
+  "name": "2_kaggle",
   "n_gpu": 1,
   "preprocessing": {
     "sr": 22050
@@ -85,7 +85,7 @@
     "args": {
       "steps_per_epoch": 10000,
       "epochs": 16,
-      "anneal_strategy": "cos",
+      "anneal_strategy": "linear",
       "max_lr": 1e-3,
       "pct_start": 0.1
     }
@@ -99,7 +99,7 @@
     "early_stop": 100,
     "visualize": "wandb",
     "wandb_project": "tts_project",
-    "wandb_name": "1_initial",
+    "wandb_name": "2_kaggle",
     "len_epoch": 10000,
     "log_step": 500,
     "grad_norm_clip": 10
