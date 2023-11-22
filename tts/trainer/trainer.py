@@ -171,7 +171,8 @@ class Trainer(BaseTrainer):
         for mels, name in zip([mel_target, mel_pred], ["target_spec", "pred_spec"]):
             img = PIL.Image.open(plot_spectrogram_to_buf(mels[idx].detach().cpu().numpy().T))
             self.writer.add_image(name, ToTensor()(img))
-            audio = get_wav(mels[idx].transpose(0, 1), self.waveglow, sampling_rate=self.config["preprocessing"]["sr"])
+            audio = get_wav(mels[idx].transpose(0, 1).unsqueeze(0),
+                            self.waveglow, sampling_rate=self.config["preprocessing"]["sr"])
             self._log_audio(audio, name.replace("spec", "wav"))
 
     def _log_audio(self, audio, name):
