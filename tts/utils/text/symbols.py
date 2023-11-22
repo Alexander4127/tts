@@ -1,4 +1,4 @@
-import tts.text.cmudict as cmudict
+import tts.utils.text.cmudict as cmudict
 
 
 """ from https://github.com/keithito/tacotron """

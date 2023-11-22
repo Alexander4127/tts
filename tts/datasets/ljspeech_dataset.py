@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 from tts.utils import ROOT_PATH
 from tts.logger import logger
-from tts.text import text_to_sequence
+from tts.utils.text import text_to_sequence
 
 
 class LJSpeechDataset(object):
