@@ -35,9 +35,9 @@ def get_dataloaders(configs: ConfigParser):
             f"Batch size ({bs}) shouldn't be larger than dataset length ({len(dataset)})"
 
         # create dataloader
-        expand_batch_dim = configs.config["collator_args"]["expand_batch_dim"]
+        batch_expand_dim = configs.config["collator_args"]["batch_expand_dim"]
         dataloader = DataLoader(
-            dataset, batch_size=bs * expand_batch_dim, collate_fn=Collator(**configs.config["collator_args"]),
+            dataset, batch_size=bs * batch_expand_dim, collate_fn=Collator(**configs.config["collator_args"]),
             shuffle=shuffle, num_workers=num_workers, drop_last=drop_last
         )
         dataloaders[split] = dataloader
