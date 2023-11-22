@@ -25,7 +25,7 @@ class LJSpeechDataset(object):
             self.index = self.index[:limit]
 
     def _load_index(self):
-        text = self._process_text(self._data_dir / "train.txt")
+        text = self.process_text(self._data_dir / "train.txt")
         pitch_dir, energy_dir = self._save_pitch_and_energy(len(text))
         start = time.perf_counter()
         index = []
@@ -69,7 +69,7 @@ class LJSpeechDataset(object):
     def _save_pitch_and_energy(self, length: int):
         pitch_dir = self._data_dir / "pitch"
         energy_dir = self._data_dir / "energy"
-        if pitch_dir.exists() and energy_dir.exists() and len(os.listdir(str(pitch_dir))) == length:
+        if pitch_dir.exists() and energy_dir.exists() and len(os.listdir(str(pitch_dir))) >= length:
             return pitch_dir, energy_dir
         pitch_dir.mkdir(exist_ok=True, parents=True)
         energy_dir.mkdir(exist_ok=True, parents=True)
@@ -113,7 +113,7 @@ class LJSpeechDataset(object):
         return pitch_dir, energy_dir
 
     @staticmethod
-    def _process_text(text_path):
+    def process_text(text_path):
         with open(text_path, "r", encoding="utf-8") as f:
             txt = []
             for line in f.readlines():
