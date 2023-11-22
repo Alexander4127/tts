@@ -57,6 +57,7 @@ def main(config, create_loaders: bool = False):
         config=config,
         device=device,
         dataloaders=dataloaders,
+        batch_expand_dim=config["collator_args"]["batch_expand_dim"],
         lr_scheduler=lr_scheduler,
         len_epoch=config["trainer"].get("len_epoch", None),
         log_step=config["trainer"].get("log_step", 50)

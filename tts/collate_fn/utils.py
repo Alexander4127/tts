@@ -82,7 +82,7 @@ def process_lengths(arr):
 def reprocess_tensor(batch: List[dict], cut_list):
     texts = [batch[ind]["text"] for ind in cut_list]
     mel_targets = [batch[ind]["mel_target"] for ind in cut_list]
-    durations = [batch[ind]["duration"] for ind in cut_list]
+    durations = [batch[ind]["duration_target"] for ind in cut_list]
     pitches = [batch[ind]["pitch_target"] for ind in cut_list]
     energies = [batch[ind]["energy_target"] for ind in cut_list]
 
@@ -97,9 +97,9 @@ def reprocess_tensor(batch: List[dict], cut_list):
 
     return {
         "src_seq": texts,
-        "mel_target": mel_targets,
-        "duration": durations,
+        "length_target": durations,
         "mel_pos": mel_pos,
+        "mel_target": mel_targets,
         "src_pos": src_pos,
         "mel_max_len": max_mel_len,
         "pitch_target": pitch_targets,

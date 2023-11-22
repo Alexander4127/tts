@@ -63,7 +63,7 @@
       "num_workers": 5,
       "dataset": {
         "type": "LJSpeechDataset",
-        "args": {"limit": 10}
+        "args": {"limit": 100}
       }
     }
   },

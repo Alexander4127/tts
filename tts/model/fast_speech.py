@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+from tts.base.base_model import BaseModel
 from .decoder import Decoder
 from .encoder import Encoder
 from .adaptor import VarianceAdaptor
@@ -8,7 +9,7 @@ from .regulator import LengthRegulator
 from .utils import get_mask_from_lengths
 
 
-class FastSpeech2(nn.Module):
+class FastSpeech2(BaseModel):
     """ FastSpeech2 """
     def __init__(self,
                  vocab_size,
@@ -56,7 +57,8 @@ class FastSpeech2(nn.Module):
                 mel_max_length=None,
                 length_target=None,
                 pitch_target=None,
-                energy_target=None):
+                energy_target=None,
+                **kwargs):
         enc_out, _ = self.encoder(src_seq, src_pos)
 
         out_reg, length_pred = self.length_regulator(enc_out, length_target, mel_max_length)
