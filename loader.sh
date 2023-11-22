@@ -25,3 +25,4 @@ mv alignments data/
 
 git clone https://github.com/xcmyz/FastSpeech.git
 mv FastSpeech/waveglow/* .
+mv FastSpeech/glow.py .

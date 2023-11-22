@@ -16,6 +16,7 @@ from tqdm import tqdm
 from tts.base import BaseTrainer
 from tts.logger.utils import plot_spectrogram_to_buf
 from tts.utils import inf_loop, MetricTracker
+from waveglow.inference import get_wav
 
 
 class Trainer(BaseTrainer):
@@ -32,6 +33,7 @@ class Trainer(BaseTrainer):
             device,
             dataloaders,
             batch_expand_dim,
+            waveglow,
             batch_accum=1,
             lr_scheduler=None,
             len_epoch=None,
@@ -45,6 +47,7 @@ class Trainer(BaseTrainer):
         self.batch_expand_dim = batch_expand_dim
         self.batch_accum = batch_accum
         self.len_loader = len(self.train_dataloader)
+        self.waveglow = waveglow
         if len_epoch is None:
             # epoch-based training
             self.len_epoch = len(self.train_dataloader)
@@ -129,12 +132,6 @@ class Trainer(BaseTrainer):
 
         return log
 
-    def _log_spectrogram(self, mel_target, mel_pred, **batch):
-        idx = np.random.choice(np.arange(len(mel_target)))
-        for mels, name in zip([mel_target, mel_pred], ["target_spec", "pred_spec"]):
-            img = PIL.Image.open(plot_spectrogram_to_buf(mels[idx].detach().cpu().numpy().T))
-            self.writer.add_image(name, ToTensor()(img))
-
     def process_batch(self, batch, is_train: bool, idx: int, metrics: MetricTracker):
         batch = self.move_batch_to_device(batch, self.device)
         if is_train:
@@ -168,6 +165,14 @@ class Trainer(BaseTrainer):
                 self.logger.warning(f'Caught {err}')
                 metrics.update(met, np.nan)
         return batch
+
+    def _log_spectrogram(self, mel_target, mel_pred, **batch):
+        idx = np.random.choice(np.arange(len(mel_target)))
+        for mels, name in zip([mel_target, mel_pred], ["target_spec", "pred_spec"]):
+            img = PIL.Image.open(plot_spectrogram_to_buf(mels[idx].detach().cpu().numpy().T))
+            self.writer.add_image(name, ToTensor()(img))
+            audio = get_wav(mels[idx].transpose(0, 1), self.waveglow, sampling_rate=self.config["preprocessing"]["sr"])
+            self._log_audio(audio, name.replace("spec", "wav"))
 
     def _log_audio(self, audio, name):
         self.writer.add_audio(name, audio, sample_rate=self.config["preprocessing"]["sr"])

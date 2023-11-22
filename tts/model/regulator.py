@@ -32,9 +32,11 @@ class LengthRegulator(nn.Module):
         duration_predictor_output = self.duration_predictor(x)
         if target is None:
             # inference
-            duration_predictor_output = F.relu(duration_predictor_output * self.alpha + 0.5).long()
+            duration_predictor_output = torch.exp(duration_predictor_output) - 1
+            duration_predictor_output = F.relu(duration_predictor_output * self.alpha).long()
             out = self.LR(x, duration_predictor_output)
-            return out, torch.stack([torch.Tensor([i + 1 for i in range(out.shape[1])])]).long().to(x.device)
+            mel_pos = torch.stack([torch.arange(1, out.shape[1] + 1)]).long().to(x.device)
+            return out, mel_pos
 
         # train
         out = self.LR(x, target, mel_max_length)

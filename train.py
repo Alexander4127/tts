@@ -11,6 +11,7 @@ from tts.trainer import Trainer
 from tts.utils import prepare_device
 from tts.utils.object_loading import get_dataloaders
 from tts.utils.parse_config import ConfigParser
+from waveglow.inference import load_waveglow
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -22,14 +23,11 @@ torch.backends.cudnn.benchmark = False
 np.random.seed(SEED)
 
 
-def main(config, create_loaders: bool = False):
+def main(config):
     logger = config.get_logger("train")
 
     # setup data_loader instances
     dataloaders = get_dataloaders(config)
-    if create_loaders:
-        logger.info('Loaders successfully created')
-        return
 
     # build model architecture, then print to console
     model = config.init_obj(config["arch"], module_arch)
@@ -50,6 +48,9 @@ def main(config, create_loaders: bool = False):
     optimizer = config.init_obj(config["optimizer"], torch.optim, trainable_params)
     lr_scheduler = config.init_obj(config["lr_scheduler"], torch.optim.lr_scheduler, optimizer)
 
+    # pretrained model
+    waveglow = load_waveglow("waveglow/pretrained_model/waveglow_256channels.pt", device)
+
     trainer = Trainer(
         model,
         loss_module,
@@ -57,6 +58,7 @@ def main(config, create_loaders: bool = False):
         config=config,
         device=device,
         dataloaders=dataloaders,
+        waveglow=waveglow,
         batch_expand_dim=config["collator_args"]["batch_expand_dim"],
         lr_scheduler=lr_scheduler,
         len_epoch=config["trainer"].get("len_epoch", None),
