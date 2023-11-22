@@ -11,7 +11,7 @@ from tts.trainer import Trainer
 from tts.utils import prepare_device
 from tts.utils.object_loading import get_dataloaders
 from tts.utils.parse_config import ConfigParser
-from waveglow.inference import load_waveglow
+from tts.utils.util import load_waveglow
 
 warnings.filterwarnings("ignore", category=UserWarning)
 

@@ -17,8 +17,9 @@ from tts.trainer import Trainer
 from tts.utils import ROOT_PATH
 from tts.utils.parse_config import ConfigParser
 from tts.utils.text import text_to_sequence
+from tts.utils.util import load_waveglow
 from train import SEED
-from waveglow.inference import get_wav, load_waveglow
+from waveglow.inference import get_wav
 from glow import WaveGlow
 
 DEFAULT_CHECKPOINT_PATH = ROOT_PATH / "default_test_model" / "checkpoint.pth"

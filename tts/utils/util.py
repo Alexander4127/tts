@@ -81,3 +81,14 @@ class MetricTracker:
 
     def keys(self):
         return self._data.total.keys()
+
+
+def load_waveglow(waveglow_path, device):
+    waveglow = torch.load(waveglow_path, map_location=device)["model"]
+    waveglow = waveglow.to(device).eval()
+    waveglow = waveglow.remove_weightnorm(waveglow)
+    for module in waveglow.modules():
+        if "Conv" in str(type(module)):
+            setattr(module, "padding_mode", "zeros")
+    return waveglow
+
