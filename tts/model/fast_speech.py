@@ -50,6 +50,11 @@ class FastSpeech2(BaseModel):
         mask = mask.unsqueeze(-1).expand(-1, -1, mel_output.size(-1))
         return mel_output.masked_fill(mask, 0.)
 
+    def reset_alphas(self, alpha_length, alpha_pitch, alpha_energy):
+        self.length_regulator.alpha = alpha_length
+        self.pitch_adaptor.alpha = alpha_pitch
+        self.energy_adaptor.alpha = alpha_energy
+
     def forward(self,
                 src_seq,
                 src_pos,
@@ -70,14 +75,12 @@ class FastSpeech2(BaseModel):
         if self.training:
             out = self.decoder(s, mel_pos)
             out = self.mask_tensor(out, mel_pos, mel_max_length)
-            return {
-                "mel_pred": self.mel_linear(out),
-                "length_pred": length_pred,
-                "pitch_pred": pitch_pred,
-                "energy_pred": energy_pred
-            }
         else:
             out = self.decoder(s, length_pred)
-            return {
-                "mel_pred": self.mel_linear(out)
-            }
+
+        return {
+            "mel_pred": self.mel_linear(out),
+            "length_pred": length_pred,
+            "pitch_pred": pitch_pred,
+            "energy_pred": energy_pred
+        }
