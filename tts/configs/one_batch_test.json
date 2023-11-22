@@ -63,12 +63,12 @@
       "num_workers": 5,
       "dataset": {
         "type": "LJSpeechDataset",
-        "args": {"limit": 100}
+        "args": {"limit": 10}
       }
     }
   },
   "collator_args": {
-    "batch_expand_dim": 10
+    "batch_expand_dim": 1
   },
   "optimizer": {
     "type": "Adam",
