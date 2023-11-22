@@ -6,6 +6,7 @@ tensorboard
 matplotlib
 pandas
 
+axel
 speechbrain~=0.5.12
 datasets
 gdown
