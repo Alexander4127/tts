@@ -1,5 +1,7 @@
+apt install axel || exit 1
+
 printf "downloading LjSpeech...\n"
-wget https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2 -o /dev/null
+axel -n 8 https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2 -o /dev/null
 mkdir data
 tar -xvf LJSpeech-1.1.tar.bz2 >> /dev/null
 mv LJSpeech-1.1 data/LJSpeech-1.1
@@ -19,7 +21,7 @@ echo $(ls mels | wc -l)
 mv mels data/
 
 printf "downloading alignments...\n"
-wget https://github.com/xcmyz/FastSpeech/raw/master/alignments.zip
+axel -n 8 https://github.com/xcmyz/FastSpeech/raw/master/alignments.zip
 unzip alignments.zip >> /dev/null
 mv alignments data/
 
