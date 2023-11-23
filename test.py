@@ -81,13 +81,6 @@ def main(args, config):
 if __name__ == "__main__":
     args = argparse.ArgumentParser(description="PyTorch Template")
     args.add_argument(
-        "-c",
-        "--config",
-        default=None,
-        type=str,
-        help="config file path (default: None)",
-    )
-    args.add_argument(
         "-i",
         "--input-text",
         type=str,
@@ -129,20 +122,6 @@ if __name__ == "__main__":
         type=bool,
         help="Save results in wandb or not (wand params are in config file)"
     )
-    args.add_argument(
-        "-t",
-        "--test-data-folder",
-        default=None,
-        type=str,
-        help="Path to dataset",
-    )
-    args.add_argument(
-        "-s",
-        "--segment-audio",
-        default=None,
-        type=int,
-        help="Split each audio into chunks with provided length"
-    )
 
     args = args.parse_args()
 
@@ -155,11 +134,6 @@ if __name__ == "__main__":
     model_config = Path(args.resume).parent / "config.json"
     with model_config.open() as f:
         config = ConfigParser(json.load(f), resume=args.resume)
-
-    # update with addition configs from `args.config` if provided
-    if args.config is not None:
-        with Path(args.config).open() as f:
-            config.config.update(json.load(f))
 
     # prepare output dir
     Path(args.output).mkdir(exist_ok=True, parents=True)
