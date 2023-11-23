@@ -77,7 +77,9 @@ class VarianceAdaptor(nn.Module):
         pred = self.predictor(x)
         if target is None:
             norm = self.alpha * (torch.exp(pred) - 1)
+            max_val = self.emb.num_embeddings
             buckets = torch.bucketize(torch.log1p(norm), self.bins)
+            buckets = torch.clip(buckets, min=0, max=max_val - 1)
         else:
             buckets = torch.bucketize(torch.log1p(target), self.bins)
         return self.emb(buckets), pred
