@@ -7,13 +7,9 @@ matplotlib
 pandas
 
 axel
-speechbrain~=0.5.12
 datasets
 gdown
 inflect
-pesq
-torch_audiomentations
-torchmetrics
 wandb
 wget
 torchaudio~=0.11.0
