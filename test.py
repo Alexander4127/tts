@@ -13,7 +13,6 @@ from tqdm import tqdm
 from tts.datasets import LJSpeechDataset
 from tts.logger import WanDBWriter
 import tts.model as module_model
-from tts.trainer import Trainer
 from tts.utils import ROOT_PATH
 from tts.utils.parse_config import ConfigParser
 from tts.utils.text import text_to_sequence
@@ -50,26 +49,33 @@ def main(args, config):
 
     # read text to test
     texts = LJSpeechDataset.process_text(args.input_text)
-    src_seq = [text_to_sequence(text, ["english_cleaners"]) for text in texts]
+    src_seq = [text_to_sequence(text[:-1], ["english_cleaners"]) for text in texts]
 
     waveglow = load_waveglow(args.waveglow_path, device)
     sr = config["preprocessing"]["sr"]
+    alphas = [
+        (1, 1, 1), (1, 1, 1.2), (1, 1, 0.8),
+        (1, 1.2, 1), (1, 0.8, 1), (1.2, 1, 1),
+        (0.8, 1, 1), (1.2, 1.2, 1.2), (0.8, 0.8, 0.8)
+    ]
     with torch.no_grad():
-        for idx, (text, seq) in tqdm(enumerate(zip(texts, src_seq)), total=len(texts)):
+        for idx, (text, seq) in tqdm(enumerate(zip(texts, src_seq)), total=len(texts), desc="Texts"):
             length = len(seq)
             seq = torch.tensor(seq).to(device).unsqueeze(0)
             pos = torch.arange(1, length + 1).to(device).unsqueeze(0)
 
-            pred = model(src_seq=seq, src_pos=pos)
-            audio = get_wav(pred["mel_pred"].transpose(-1, -2), waveglow=waveglow, sampling_rate=sr).unsqueeze(0)
-            np.save("output/pitch.npy", pred["pitch_pred"].numpy())
-            np.save("output/energy.npy", pred["energy_pred"].numpy())
-            np.save("output/spec.npy", pred["mel_pred"].numpy())
-
-            torchaudio.save(Path(args.output) / f"{idx + 1}.wav", audio, sample_rate=sr)
             if writer is not None:
-                writer.add_audio("test", audio, sample_rate=sr)
-                writer.add_text("test", text)
+                writer.set_step(step=idx)
+                writer.add_text(f"test-text", text)
+            for a_idx, (alpha_dur, alpha_pitch, alpha_energy) in enumerate(tqdm(alphas, desc="Alphas")):
+                model.reset_alphas(alpha_dur, alpha_pitch, alpha_energy)
+                pred = model(src_seq=seq, src_pos=pos)
+                audio = get_wav(pred["mel_pred"].transpose(-1, -2), waveglow=waveglow, sampling_rate=sr).unsqueeze(0)
+
+                suf = f"{alpha_dur:.1f}-{alpha_pitch:.1f}-{alpha_energy:.1f}"
+                torchaudio.save(Path(args.output) / f"{idx + 1}-{suf}.wav", audio, sample_rate=sr)
+                if writer is not None:
+                    writer.add_audio(f"test-{suf}-audio", audio, sample_rate=sr)
 
 
 if __name__ == "__main__":
